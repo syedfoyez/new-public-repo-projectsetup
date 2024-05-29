@@ -25,5 +25,22 @@
         }
       ]
     }
+  },
+
+  "GET /api/articles/:article_id": {
+    "description": "Returns an article by its ID",
+    "queries": [],
+    "exampleResponse": {
+      "article": {
+      "author": "",
+      "title": "",
+      "article_id": 1,
+      "body": "",
+      "topic": "",
+      "created_at": "",
+      "votes": 0,
+      "article_img_url": ""
+      }
+    }
   }
 }
