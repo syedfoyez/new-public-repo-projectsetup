@@ -14,7 +14,7 @@ describe('GET /api/topics', () => {
         .expect(200)
         .then(({body}) => {
             expect(body.topics).toHaveLength(3)
-            body.topics.map((topic) => {
+            body.topics.forEach((topic) => {
                 expect(topic).toMatchObject({
                     slug: expect.any(String),
                     description: expect.any(String),
@@ -22,6 +22,9 @@ describe('GET /api/topics', () => {
             });
         });
     });
+});
+
+describe('General error handling', () => {
     test('404: responds with an error message when route is not found', async () => {
         const { body } = await request(app).get('/api/not-a-route').expect(404);
         expect(body.msg).toBe('Route not found');
