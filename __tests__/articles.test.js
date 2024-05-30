@@ -80,3 +80,72 @@ describe('GET /api/articles', () => {
         });
     });
 });
+
+describe('PATCH /api/articles/:article_id', () => {
+    test('200: responds with the updated article', () => {
+        const incVotes = { inc_votes: 1 };
+        return request(app)
+        .patch('/api/articles/1')
+        .send(incVotes)
+            .expect(200)
+            .then((response) => {
+                const { article } = response.body;
+                expect(article).toEqual(
+                    expect.objectContaining({
+                        article_id: 1,
+                        votes: expect.any(Number)
+                    })
+                )
+                expect(article.votes).toBe(101);
+            })
+    })
+
+    test('200: responds with the updated article when votes are decremented', () => {
+        const incVotes = { inc_votes: -100 };
+        return request(app)
+        .patch('/api/articles/1')
+        .send(incVotes)
+        .expect(200)
+        .then((response) => {
+            const { article } = response.body;
+            expect(article).toEqual(
+                expect.objectContaining({
+                    article_id: 1,
+                    votes: expect.any(Number)
+                })
+            );
+            expect(article.votes).toBe(0);
+        });
+    });
+
+
+    test('400: responds with an error message when inc_votes is missing', () => {
+        return request(app)
+        .patch('/api/articles/1')
+        .send({})
+        .expect(400)
+        .then((response) => {
+            expect(response.body.msg).toBe('Bad request');
+        });
+    });
+
+    test('400: responds with an error message when article_id is invalid', () => {
+        return request(app)
+        .patch('/api/articles/not-a-number')
+        .send({ inc_votes: 1 })
+        .expect(400)
+         .then((response) => {
+            expect(response.body.msg).toBe('Bad request');
+        });
+    });
+
+    test('404: responds with an error message when article is not found', () => {
+        return request(app)
+        .patch('/api/articles/99999')
+        .send({ inc_votes: 1 })
+        .expect(404)
+        .then((response) => {
+            expect(response.body.msg).toBe('Article not found');
+        });
+    });
+})
