@@ -49,7 +49,7 @@ describe('GET /api/articles/:article_id', () => {
 });
 
 describe('GET /api/articles', () => {
-    test('200: responds with an array of article objects, each containing author, title, article_id, topic, created_at, votes, article_img_url, comment_count', () => {
+    test('200: responds with an array of article objects, each containing author, title, article_id, topic, created_at, votes, article_img_url, comment_count and the response is sorted by date in descending order', () => {
         return request(app)
         .get('/api/articles')
         .expect(200)

@@ -8,22 +8,14 @@ beforeEach(() => seed(testData));
 afterAll(() => db.end());
 
 describe('GET /api/articles/:article_id/comments', () => {
-    let validArticleId;
-
-
-    beforeEach(() => {
-        return db.query('SELECT article_id FROM articles LIMIT 1;').then(({ rows }) => {
-            validArticleId = rows[0].article_id;
-        });
-    });
 
     test('200: responds with an array of comment objects for the given article_id, sorted by date in descending order', () => {
         return request(app)
-        .get(`/api/articles/${validArticleId}/comments`)
+        .get('/api/articles/1/comments')
         .expect(200)
         .then((response) => {
             const comments = response.body.comments;
-            expect(comments).toBeInstanceOf(Array);
+            
             expect(comments).toHaveLength(testData.commentData.filter(comment => comment.article_id === 1).length);
             expect(comments).toBeSortedBy('created_at', { descending: true });
 
@@ -56,6 +48,80 @@ describe('GET /api/articles/:article_id/comments', () => {
     test('400: responds with an error message when article_id is invalid', () => {
         return request(app)
         .get('/api/articles/not-a-number/comments')
+        .expect(400)
+        .then((response) => {
+            expect(response.body.msg).toBe('Bad request');
+        });
+    });
+})
+
+describe('POST /articles/:article_id/comments', () => {
+
+    test('201: responds with the posted comment', () => {
+        const newComment = {
+            username: 'butter_bridge',
+            body: 'This is a new comment'
+        };
+
+        return request(app)
+        .post('/api/articles/1/comments')
+        .send(newComment)
+        .expect(201)
+        .then((response) => {
+            const comment = response.body.comment;
+            expect(comment).toEqual(
+                expect.objectContaining({
+                    comment_id: expect.any(Number),
+                    article_id: expect.any(Number),
+                    author: 'butter_bridge',
+                    body: 'This is a new comment',
+                    votes: 0,
+                    created_at: expect.any(String)
+                })
+            )
+        })
+
+    })
+
+    test('404: responds with an error message when article is not found', () => {
+        const newComment = {
+            username: 'butter_bridge',
+            body: 'This is a new comment'
+        };
+
+        return request(app)
+        .post('/api/articles/99999/comments')
+        .send(newComment)
+        .expect(404)
+        .then((response) => {
+            expect(response.body.msg).toBe('Article not found');
+        });
+    })
+
+
+    test('400: responds with an error message when article_id is invalid', () => {
+        const newComment = {
+            username: 'butter_bridge',
+            body: 'This is a new comment'
+        }
+
+        return request(app)
+        .post('/api/articles/not-a-number/comments')
+        .send(newComment)
+        .expect(400)
+        .then((response) => {
+            expect(response.body.msg).toBe('Bad request');
+        });
+    })
+
+    test('400: responds with an error message when username or body is missing', () => {
+        const newComment = {
+            body: 'This is a new comment'
+        };
+
+        return request(app)
+        .post('/api/articles/1/comments')
+        .send(newComment)
         .expect(400)
         .then((response) => {
             expect(response.body.msg).toBe('Bad request');
