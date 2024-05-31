@@ -1,4 +1,4 @@
-const { selectCommentsByArticleId, insertCommentByArticleId } = require('../model/comments.models');
+const { selectCommentsByArticleId, insertCommentByArticleId, deleteCommentById } = require('../model/comments.models');
 
 exports.getCommentsByArticleId = (req, res, next) => {
     const { article_id } = req.params;
@@ -34,3 +34,18 @@ exports.addCommentByArticleId = (req, res, next) => {
         next(err);
     });
 };
+
+exports.removeCommentById = (req, res, next) => {
+    const { comment_id } = req.params;
+    
+    deleteCommentById(comment_id)
+    .then((result) => {
+        if (result.rowCount === 0) {
+            return res.status(404).send({ msg: 'Comment not found' });
+        }
+        res.status(204).send();
+    })
+    .catch((err) => {
+        next(err);
+    })
+}

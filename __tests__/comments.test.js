@@ -72,7 +72,7 @@ describe('POST /articles/:article_id/comments', () => {
             expect(comment).toEqual(
                 expect.objectContaining({
                     comment_id: expect.any(Number),
-                    article_id: expect.any(Number),
+                    article_id: 1,
                     author: 'butter_bridge',
                     body: 'This is a new comment',
                     votes: 0,
@@ -114,7 +114,7 @@ describe('POST /articles/:article_id/comments', () => {
         });
     })
 
-    test('400: responds with an error message when username or body is missing', () => {
+    test('400: responds with an error message when username', () => {
         const newComment = {
             body: 'This is a new comment'
         };
@@ -127,4 +127,45 @@ describe('POST /articles/:article_id/comments', () => {
             expect(response.body.msg).toBe('Bad request');
         });
     });
+
+    test('400: responds with an error message when body is missing', () => {
+        const newComment = {
+            username: 'butter_bridge'
+        };
+
+        return request(app)
+        .post('/api/articles/1/comments')
+        .send(newComment)
+        .expect(400)
+        .then((response) => {
+            expect(response.body.msg).toBe('Bad request');
+        });
+    });
+})
+
+describe('DELETE /api/comments/:comment_id', () => {
+    test('204: responds with no content when comment is deleted', () => {
+        return request(app)
+        .delete('/api/comments/1')
+        .expect(204);
+    })
+
+    test('404: responds with an error message when comment_id is not found', () => {
+        return request(app)
+        .delete('/api/comments/99999')
+        .expect(404)
+        .then((response) => {
+            expect(response.body.msg).toBe('Comment not found');
+        });
+    })
+
+
+    test('400: responds with an error message when comment_id is invalid', () => {
+        return request(app)
+        .delete('/api/comments/not-a-number')
+        .expect(400)
+        .then((response) => {
+            expect(response.body.msg).toBe('Bad request');
+        });
+    })
 })

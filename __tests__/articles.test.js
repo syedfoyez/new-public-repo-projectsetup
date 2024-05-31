@@ -82,7 +82,7 @@ describe('GET /api/articles', () => {
 });
 
 describe('PATCH /api/articles/:article_id', () => {
-    test('200: responds with the updated article', () => {
+    test('200: responds with the updated article when votes are incremented', () => {
         const incVotes = { inc_votes: 1 };
         return request(app)
         .patch('/api/articles/1')
@@ -146,6 +146,17 @@ describe('PATCH /api/articles/:article_id', () => {
         .expect(404)
         .then((response) => {
             expect(response.body.msg).toBe('Article not found');
+        });
+    });
+
+    test('400: responds with an error message when inc_votes is not a number', () => {
+        const incVotes = { inc_votes: 'not-a-number' };
+        return request(app)
+        .patch('/api/articles/1')
+        .send(incVotes)
+        .expect(400)
+        .then((response) => {
+            expect(response.body.msg).toBe('Bad request');
         });
     });
 })
