@@ -15,13 +15,11 @@ exports.selectArticleById = (article_id) => {
     });
 };
 exports.selectAllArticles = (topic) => {
-    console.log(topic, 'topic --------')
     let queryStr = `
         SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url,
         COUNT(comments.comment_id) AS comment_count
         FROM articles
         LEFT JOIN comments ON comments.article_id = articles.article_id`;
-        console.log(queryStr, 'queryStr --------')
         const queryParams = []
 
         if (topic) {
@@ -32,12 +30,10 @@ exports.selectAllArticles = (topic) => {
         queryStr += `
         GROUP BY articles.article_id
         ORDER BY articles.created_at DESC;`;
-        console.log(queryStr, 'queryStr -----')
 
     return db
     .query(queryStr, queryParams)
     .then((result) => {
-        console.log(result.rows, 'result.rows ----')
         return result.rows;
     });
 };
