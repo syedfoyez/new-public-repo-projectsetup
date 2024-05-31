@@ -13,8 +13,9 @@ describe('GET /api/users', () => {
         .get('/api/users')
         .expect(200)
         .then((response) => {
-            const users = response.body.users;
+            const {users} = response.body;
             expect(users).toBeInstanceOf(Array);
+            expect(users).toHaveLength(testData.userData.length)
             users.forEach((user) => {
                 expect(user).toEqual(
                     expect.objectContaining({
