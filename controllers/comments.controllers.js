@@ -40,12 +40,7 @@ exports.removeCommentById = (req, res, next) => {
     
     deleteCommentById(comment_id)
     .then((result) => {
-        if (result.rowCount === 0) {
-            return res.status(404).send({ msg: 'Comment not found' });
-        }
-        res.status(204).send();
+        res.sendStatus(204);
     })
-    .catch((err) => {
-        next(err);
-    })
+    .catch(next)
 }
