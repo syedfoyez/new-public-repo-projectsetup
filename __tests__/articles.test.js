@@ -51,33 +51,54 @@ describe('GET /api/articles/:article_id', () => {
 describe('GET /api/articles', () => {
     test('200: responds with an array of article objects, each containing author, title, article_id, topic, created_at, votes, article_img_url, comment_count and the response is sorted by date in descending order', () => {
         return request(app)
-        .get('/api/articles')
-        .expect(200)
-        .then((response) => {
-            const articles = response.body.articles;
-            expect(articles).toBeInstanceOf(Array);
-            expect(articles).toHaveLength(testData.articleData.length);
+            .get('/api/articles')
+            .expect(200)
+            .then((response) => {
+                const articles = response.body.articles;
+                expect(articles).toBeInstanceOf(Array);
+                expect(articles).toHaveLength(testData.articleData.length);
 
-            expect(articles).toBeSortedBy('created_at', { descending: true });
+                expect(articles).toBeSortedBy('created_at', { descending: true });
 
+                articles.forEach((article) => {
+                    expect(article).toEqual(
+                        expect.objectContaining({
+                            author: expect.any(String),
+                            title: expect.any(String),
+                            article_id: expect.any(Number),
+                            topic: expect.any(String),
+                            created_at: expect.any(String),
+                            votes: expect.any(Number),
+                            article_img_url: expect.any(String),
+                            comment_count: expect.any(String),
+                        })
+                    );
 
-            articles.forEach((article) => {
-                expect(article).toEqual(
-                    expect.objectContaining({
-                        author: expect.any(String),
-                        title: expect.any(String),
-                        article_id: expect.any(Number),
-                        topic: expect.any(String),
-                        created_at: expect.any(String),
-                        votes: expect.any(Number),
-                        article_img_url: expect.any(String),
-                        comment_count: expect.any(String),
-                    })
-                );
-
-                expect(article).not.toHaveProperty('body');
+                    expect(article).not.toHaveProperty('body');
+                });
             });
-        });
+    });
+
+    test('200: responds with an array of articles filtered by topic', () => {
+        return request(app)
+            .get('/api/articles?topic=mitch')
+            .expect(200)
+            .then((response) => {
+                const articles = response.body.articles;
+                expect(articles).toBeInstanceOf(Array);
+                articles.forEach((article) => {
+                    expect(article.topic).toBe('mitch');
+                });
+            });
+    });
+
+    test('200: responds with an empty array when no articles match the topic', () => {
+        return request(app)
+            .get('/api/articles?topic=nonexistent')
+            .expect(200)
+            .then((response) => {
+                expect(response.body.articles).toEqual([]);
+            });
     });
 });
 
@@ -159,4 +180,4 @@ describe('PATCH /api/articles/:article_id', () => {
             expect(response.body.msg).toBe('Bad request');
         });
     });
-})
+});
