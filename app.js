@@ -6,6 +6,7 @@ const { getArticleById, getArticles, patchArticleById } = require('./controllers
 const { getCommentsByArticleId, addCommentByArticleId, removeCommentById } = require('./controllers/comments.controllers');
 const { handleCustomErrors, handlePsqlErrors, handleServerErrors } = require('./errors');
 const { getUsers } = require('./controllers/users.controllers');
+const cors = require('cors');
 
 app.use(express.json());
 
@@ -23,8 +24,10 @@ app.all('/*', (req, res) => {
     res.status(404).send({ msg: 'Route not found' });
 });
 
+app.use(cors());
 app.use(handleCustomErrors);
 app.use(handlePsqlErrors);
 app.use(handleServerErrors);
+
 
 module.exports = app;
