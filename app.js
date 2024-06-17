@@ -8,6 +8,7 @@ const { handleCustomErrors, handlePsqlErrors, handleServerErrors } = require('./
 const { getUsers } = require('./controllers/users.controllers');
 const cors = require('cors');
 
+app.use(cors());
 app.use(express.json());
 
 app.get('/api', getApi)
@@ -24,7 +25,6 @@ app.all('/*', (req, res) => {
     res.status(404).send({ msg: 'Route not found' });
 });
 
-app.use(cors());
 app.use(handleCustomErrors);
 app.use(handlePsqlErrors);
 app.use(handleServerErrors);
